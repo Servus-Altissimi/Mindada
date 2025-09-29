@@ -1,0 +1,16 @@
+[package]
+name = "Mindada"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[build-dependencies]
+cc = "1.0"
+
+[profile.release]
+panic = "abort"
+lto = true
+
+[target.x86_64-Mindada]
+rustflags = ["-C", "link-arg=-Tlinker.ld"]
