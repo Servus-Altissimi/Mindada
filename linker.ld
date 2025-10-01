@@ -1,26 +1,43 @@
+OUTPUT_FORMAT(elf64-x86-64)
+OUTPUT_ARCH(i386:x86-64)
 ENTRY(_start)
 
-SECTIONS {
+SECTIONS
+{
     . = 1M;
 
-    .multiboot : ALIGN(4K) {
+    .boot : {
         KEEP(*(.multiboot))
+        *(.text.boot)
     }
 
-    .text : ALIGN(4K) {
-        KEEP(*(.text .text.*))
+    .text : {
+        *(.text)
+        *(.text.*)
     }
 
-    .rodata : ALIGN(4K) {
-        *(.rodata .rodata.*)
+    .rodata : {
+        *(.rodata)
+        *(.rodata.*)
     }
 
-    .data : ALIGN(4K) {
-        *(.data .data.*)
+    .data : {
+        *(.data)
+        *(.data.*)
     }
 
-    .bss : ALIGN(4K) {
+    .bss : {
+        __bss_start = .;
+        *(.bss)
+        *(.bss.*)
         *(COMMON)
-        *(.bss .bss.*)
+        __bss_end = .;
+    }
+
+    /DISCARD/ : {
+        *(.eh_frame)
+        *(.eh_frame_hdr)
+        *(.comment)
+        *(.note*)
     }
 }
