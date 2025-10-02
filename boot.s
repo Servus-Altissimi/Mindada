@@ -1,4 +1,4 @@
-# Multiboot header 
+# Multiboot header TODO, Multiboot2
 
 .section .multiboot
 .align 4

@@ -3,10 +3,10 @@ name = "Mindada"
 version = "0.1.0"
 edition = "2021"
 
+[dependencies]
+
 [lib]
 crate-type = ["staticlib"]
-
-[dependencies]
 
 [profile.release]
 panic = "abort"
