@@ -1,11 +1,26 @@
-# Multiboot header TODO, Multiboot2
+# Multiboot header
 
 .section .multiboot
-.align 4
-multiboot_header:
-    .long 0x1BADB002                    # Magic number, TODO change
-    .long 0x00000000                    # Flags
-    .long -(0x1BADB002 + 0x00000000)    # Checksum
+.align 8
+multiboot2_header:
+    .long 0xE85250D6                    # Magic number for Multiboot2
+    .long 0                             # Architecture: 0 = i386 (protected mode)
+    .long multiboot2_header_end - multiboot2_header  # Header length
+    .long -(0xE85250D6 + 0 + (multiboot2_header_end - multiboot2_header))  # Checksum
+    
+    # Information request tag
+    .align 8
+    .word 1                             # Type: information request
+    .word 0                             # Flags
+    .long 8 + 4                         # Size
+    .long 6                             # Request memory map
+    
+    # End tag
+    .align 8
+    .word 0                             # Type: end tag
+    .word 0                             # Flags
+    .long 8                             # Size
+multiboot2_header_end:
 
 .section .text.boot
 .code32
@@ -18,7 +33,7 @@ _start:
     movl $0x00107000, %esp
     movl %esp, %ebp
     
-    # Attempt to save multiboot info
+    # Save multiboot2 info (EAX = magic, EBX = info pointer)
     pushl %ebx
     pushl %eax
     
@@ -50,7 +65,6 @@ _start:
     movl $0x3000, %ecx
     xorl %eax, %eax
     rep stosl
-    
     
     # PML4 at 0x108000
     movl $0x108000, %edi
@@ -160,9 +174,11 @@ long_mode_start:
     xorb %al, %al
     rep stosb
     
-    # Restore multiboot info
-    popq %rdi  # Multiboot stuff
-    popq %rsi  # Multiboot info
+    # Restore multiboot2 info (zero-extend to 64-bit)
+    popq %rax
+    movl %eax, %edi             # Magic number in RDI
+    popq %rax
+    movl %eax, %esi             # Info pointer in RSI
     
     # Call kernel
     call kernel_main
@@ -182,7 +198,7 @@ default_handler:
 .align 16
 gdt_start:
     .quad 0x0000000000000000    # Null descriptor
-    .quad 0x00209A0000000000    # Code segment
+    .quad 0x00209A0000000000    # Code segment (64-bit)
     .quad 0x0000920000000000    # Data segment
 gdt_end:
 

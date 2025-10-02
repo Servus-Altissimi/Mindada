@@ -30,13 +30,13 @@ fi
 
 echo "Verifying multiboot header"
 HEADER=$(od -An -t x4 -N 12 kernel.bin | tr -d ' \n')
-if echo "$HEADER" | grep -q "1badb002"; then
+if echo "$HEADER" | grep -q "e85250d6"; then
     echo "Multiboot header found"
     echo "Header bytes: $HEADER"
 else
     echo "Multiboot header not found at start of binary"
     echo "First 12 bytes: $HEADER"
-    echo "Expected to see: 1badb002 00000000 e4524ffb (or similar)"
+    echo "Expected to see: e85250d6 00000000 e4524ffb (or similar)"
 fi
 
 echo "Build successfully"
@@ -56,7 +56,7 @@ set timeout=0
 set default=0
 
 menuentry "Mindada" {
-    multiboot /boot/kernel.bin
+    multiboot2 /boot/kernel.bin
     boot
 }
 EOF
